@@ -76,13 +76,6 @@
 				color: white;
 				font-weight: bold;
 			}
-			
-
-
-			
-			
-			
-
 	
 	</style>
   
@@ -101,7 +94,6 @@
 			
 		
 			var url = "https://data.smartdublin.ie/cgi-bin/rtpi/busstopinformation?stopid&format=json"
-			// leaflet map with canvas method; faster performance
 			var map = L.map('map',{
 				preferCanvas: true
 			}).setView([53.33306, -6.24889], 14);
@@ -116,12 +108,7 @@
 			
 				var results = data.results;
 				var numberOfStops = results.length;	
-
-				
-				
-				console.log(numberOfStops);
 			
-				// get lat and long of stops
 				for (var i = 0; i < numberOfStops; i++){
 					
 
@@ -133,27 +120,22 @@
 					
 					var circleMarker = new L.circleMarker([latitude,longitude],{
 							color: '#3388ff',
-							radius: 10,
+							radius: 6,
 							fillOpacity: 1,
 							// Binding data to a marker
 							stopNumber: stopid,
 							nameStop: fullname
-						
-							
 							})
-						//.bindPopup("This popup triggers outside the circlemarker")
+					
 						.addTo(map).on('click', onClick);
 										
 				};
 				
 				function onClick(e) {
-					console.log(this.getLatLng());
-					// pulls out the data binded to a point selected on the map
-					console.log("You clicked the marker " + e.target.options.stopNumber);
-					
+
 					var stopid = e.target.options.stopNumber;
 					var nameStop = e.target.options.nameStop;
-					
+	
 					showInformation(stopid, nameStop);
 					
 				};
@@ -174,21 +156,13 @@
 						d3.select("#content")
 							.selectAll("table")
 							.remove();
-							
-					
-					
+																	
 					d3.json(urlStop, function(dataStop) {
-						// show infobox
 						$("#infoBox").css({'visibility':'visible'});
-						
-						console.log(dataStop);
 						
 						var headers = ["route","duetime", "destination", "origin","monitored" ]
 						var results = dataStop.results	
-						
-						console.log(dataStop);
 
-						
 						var output='<table class="table table-hover">';
 						
 							output+='<tr><th scope="col">'+'Number'+'</th><th scope="col">'+'Arrival'+'</th><th scope="col">'+'Destination'+'</th><th scope="col">'+'Orgin'+'</th>'+'</th><th scope="col">'+'Monitored'+'</th></tr>'
@@ -196,9 +170,7 @@
 								output+='<tr><td>'+results[i].route+'</td><td>'+results[i].duetime+' min'+'</td><td>'+results[i].destination+'</td><td>'+results[i].origin+'</td>'+'</td><td>'+results[i].monitored+'</td></tr>'    
 							}
 							output+='</table>';
-							$('#content').append(output);
-
-					
+							$('#content').append(output);					
 					});
 				};
 			
@@ -217,15 +189,7 @@
 			function moveEndHandler () {
 				$("#infoBox").css({'visibility':'hidden'});
 			};
-			// when a user pan a map infobox hides; function called: moveEndHandler
 			map.on('moveend', moveEndHandler);
-					
-			
-
-
-	
 	</script>
-
-
 </body>
 </html>
