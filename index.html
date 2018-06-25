@@ -1,0 +1,231 @@
+<head>
+  <meta charset="utf-8">
+
+  <title>bus_stops_3</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  
+	<!--D3-->
+	<script src="https://d3js.org/topojson.v1.min.js"></script>
+	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	
+	<!-- Leaflet  https://github.com/domoritz/leaflet-locatecontrol -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+	
+	<!-- Leaflet locator -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.59/dist/L.Control.Locate.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.59/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+	<!-- jQuery  -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	
+	<!-- Bootstrap -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  
+  
+	<style>
+			body {
+				padding: 0;
+				margin: 0;
+			}
+			html, body {
+				height: 100%;
+				width: 100%;
+			}
+
+			#map {
+				height: 100%;
+				width: 100%;
+			}
+			#infoBox {
+				
+				position:absolute;
+				top: 40%;
+				left:53px;
+				visibility: hidden;
+				z-index:800;
+							
+				max-height: 50%;
+				margin: 10px;
+				border: 1px solid #3388ff;
+				background-color: #ffffff;
+			}
+			#content,
+			#infoBoxHead {
+				padding: 5px;
+			}
+			#content {
+				margin-top: 0;
+				min-height: 30%;
+				max-height: 70%;
+				overflow: auto;
+			}
+			#infoBoxHead {
+				height: 30%;
+				border-bottom: 1px solid #EEE;
+				background-color: #3388ff;
+				color: white;
+				font-weight: bold;
+			}
+			
+
+
+			
+			
+			
+
+	
+	</style>
+  
+</head>
+
+	<body>
+
+	</body>
+		<div id = "infoBox">
+			<div id = "infoBoxHead"></div>
+			<div id = "content"></div>
+		</div>
+		<div id="map"></div>
+		
+	<script>
+			
+		
+			var url = "https://data.smartdublin.ie/cgi-bin/rtpi/busstopinformation?stopid&format=json"
+			// leaflet map with canvas method; faster performance
+			var map = L.map('map',{
+				preferCanvas: true
+			}).setView([53.33306, -6.24889], 14);
+			var	mapLink = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+			
+			L.tileLayer( 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+				attribution: '&copy; ' + mapLink + ' Contributors',
+				maxZoom: 18,
+            }).addTo(map);
+			
+			d3.json(url, function(data) {
+			
+				var results = data.results;
+				var numberOfStops = results.length;	
+
+				
+				
+				console.log(numberOfStops);
+			
+				// get lat and long of stops
+				for (var i = 0; i < numberOfStops; i++){
+					
+
+					var latitude = results[i].latitude;
+					var longitude = results[i].longitude;
+					var stopid = String(results[i].stopid);
+					var fullname = String(results[i].fullname);
+					
+					
+					var circleMarker = new L.circleMarker([latitude,longitude],{
+							color: '#3388ff',
+							radius: 2,
+							fillOpacity: 1,
+							// Binding data to a marker
+							stopNumber: stopid,
+							nameStop: fullname
+						
+							
+							})
+						//.bindPopup("This popup triggers outside the circlemarker")
+						.addTo(map).on('click', onClick);
+										
+				};
+				
+				function onClick(e) {
+					console.log(this.getLatLng());
+					// pulls out the data binded to a point selected on the map
+					console.log("You clicked the marker " + e.target.options.stopNumber);
+					
+					var stopid = e.target.options.stopNumber;
+					var nameStop = e.target.options.nameStop;
+					
+					showInformation(stopid, nameStop);
+					
+				};
+				
+				function showInformation(stopid, nameStop){
+					
+					urlStop = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=' + stopid + '&format=json';
+					
+						d3.select("#infoBoxHead")
+							.selectAll("p")
+							.remove();
+							
+						d3.select("#infoBoxHead")
+							.append("p")
+							.append("text")
+							.text(nameStop);
+						
+						d3.select("#content")
+							.selectAll("table")
+							.remove();
+							
+					
+					
+					d3.json(urlStop, function(dataStop) {
+						// show infobox
+						$("#infoBox").css({'visibility':'visible'});
+						
+						console.log(dataStop);
+						
+						var headers = ["route","duetime", "destination", "origin","monitored" ]
+						var results = dataStop.results	
+						
+						console.log(dataStop);
+
+						
+						var output='<table class="table table-hover">';
+						
+							output+='<tr><th scope="col">'+'Number'+'</th><th scope="col">'+'Arrival'+'</th><th scope="col">'+'Destination'+'</th><th scope="col">'+'Orgin'+'</th>'+'</th><th scope="col">'+'Monitored'+'</th></tr>'
+							for (var i=0;i<results.length;i++){
+								output+='<tr><td>'+results[i].route+'</td><td>'+results[i].duetime+' min'+'</td><td>'+results[i].destination+'</td><td>'+results[i].origin+'</td>'+'</td><td>'+results[i].monitored+'</td></tr>'    
+							}
+							output+='</table>';
+							$('#content').append(output);
+
+					
+					});
+				};
+			
+			});
+			
+			
+			var lc = L.control.locate({
+				position: 'topleft',
+				flyTo: true,
+				strings: {
+					title: "Here you are :)"
+				}
+			}).addTo(map);
+			
+			
+			function moveEndHandler () {
+				$("#infoBox").css({'visibility':'hidden'});
+			};
+			// when a user pan a map infobox hides; function called: moveEndHandler
+			map.on('moveend', moveEndHandler);
+					
+			
+
+
+	
+	</script>
+
+
+</body>
+</html>
