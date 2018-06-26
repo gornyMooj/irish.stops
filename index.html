@@ -133,7 +133,7 @@
 					
 					var circleMarker = new L.circleMarker([latitude,longitude],{
 							color: '#3388ff',
-							radius: circleSize,
+							radius: circleSize - 5.5,
 							fillOpacity: 1,
 							// Binding data to a marker
 							stopNumber: stopid,
@@ -194,14 +194,15 @@
 					var currentZoom = map.getZoom(); // gets current zoom
 					console.log(currentZoom);
 					
-					if(currentZoom < 14){
+					if(currentZoom < 15){
 						for(var i = 0; i < circleMarkers.length; i++){
-							circleMarkers[i].setStyle({radius: 1});						
+							circleMarkers[i].setStyle({radius: 0.5});						
 						}; 						
 					}else{
 						for(var i = 0; i < circleMarkers.length; i++){
 							circleMarkers[i].setStyle({radius: circleSize});
-					};}					
+					};}
+					
 				});			
 			});
 			
@@ -213,11 +214,10 @@
 					title: "Here you are :)"
 				}
 			}).addTo(map);
-
+	
 			function moveEndHandler () {
 				$("#infoBox").css({'visibility':'hidden'});
 			};
-		
 			map.on('moveend', moveEndHandler);
 	</script>
 </body>
