@@ -116,7 +116,10 @@
 			d3.json(url, function(data) {
 			
 				var results = data.results;
-				var numberOfStops = results.length;	
+				var numberOfStops = results.length;
+				// in circleMarkers all markers are stored; it is used in the resizing of the markers
+				var circleMarkers = [];
+				var circleSize = 6;
 			
 				for (var i = 0; i < numberOfStops; i++){
 					
@@ -125,13 +128,12 @@
 					var longitude = results[i].longitude;
 					var stopid = String(results[i].stopid);
 					var fullname = String(results[i].fullname);
-					var currentZoom = map.getZoom();
-					var circleSize = 20/parseInt(currentZoom);
+
 					
 					
 					var circleMarker = new L.circleMarker([latitude,longitude],{
 							color: '#3388ff',
-							radius: 6,
+							radius: circleSize,
 							fillOpacity: 1,
 							// Binding data to a marker
 							stopNumber: stopid,
@@ -139,7 +141,8 @@
 							})
 					
 						.addTo(map).on('click', onClick);
-										
+					
+					circleMarkers.push(circleMarker);
 				};
 				
 				function onClick(e) {
@@ -184,7 +187,22 @@
 							$('#content').append(output);					
 					});
 				};
-			
+				
+				
+				map.on('zoomend', function () {
+                // dinamicly changes a size of markers depending on the current zoom level
+					var currentZoom = map.getZoom(); // gets current zoom
+					console.log(currentZoom);
+					
+					if(currentZoom < 14){
+						for(var i = 0; i < circleMarkers.length; i++){
+							circleMarkers[i].setStyle({radius: 1});						
+						}; 						
+					}else{
+						for(var i = 0; i < circleMarkers.length; i++){
+							circleMarkers[i].setStyle({radius: circleSize});
+					};}					
+				});			
 			});
 			
 			
@@ -195,11 +213,11 @@
 					title: "Here you are :)"
 				}
 			}).addTo(map);
-			
-			
+
 			function moveEndHandler () {
 				$("#infoBox").css({'visibility':'hidden'});
 			};
+		
 			map.on('moveend', moveEndHandler);
 	</script>
 </body>
