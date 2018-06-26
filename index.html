@@ -115,11 +115,13 @@
 					var longitude = results[i].longitude;
 					var stopid = String(results[i].stopid);
 					var fullname = String(results[i].fullname);
+					var currentZoom = map.getZoom();
+					var circleSize = 6/parseInt(currentZoom);
 					
 					
 					var circleMarker = new L.circleMarker([latitude,longitude],{
 							color: '#3388ff',
-							radius: 6,
+							radius: circleSize,
 							fillOpacity: 1,
 							// Binding data to a marker
 							stopNumber: stopid,
