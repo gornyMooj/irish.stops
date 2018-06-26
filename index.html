@@ -22,7 +22,12 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.59/dist/L.Control.Locate.min.css" />
 	<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.59/dist/L.Control.Locate.min.js" charset="utf-8"></script>
-
+	
+	<!-- markercluster  -->
+	<link rel="stylesheet" href="MarkerCluster.css" />
+	<link rel="stylesheet" href="MarkerCluster.Default.css" />
+	<script src="leaflet.markercluster-src.js"></script>
+	
 	<!-- jQuery  -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	
@@ -121,6 +126,11 @@
 				var circleMarkers = [];
 				var circleSize = 6;
 			
+				var markers = L.markerClusterGroup({ 
+					disableClusteringAtZoom: 11, // turn off
+					spiderfyOnMaxZoom: false,
+				});
+			
 				for (var i = 0; i < numberOfStops; i++){
 					
 
@@ -140,10 +150,14 @@
 							nameStop: fullname
 							})
 					
-						.addTo(map).on('click', onClick);
+						//.addTo(map).on('click', onClick);
+						circleMarker.on('click', onClick);
+						markers.addLayer(circleMarker);
 					
 					circleMarkers.push(circleMarker);
 				};
+				
+				map.addLayer(markers);
 				
 				function onClick(e) {
 
@@ -196,17 +210,15 @@
 					
 					if(currentZoom < 15){
 						for(var i = 0; i < circleMarkers.length; i++){
-							circleMarkers[i].setStyle({radius: 0.5});						
+							circleMarkers[i].setStyle({radius: 0.5});
 						}; 						
 					}else{
 						for(var i = 0; i < circleMarkers.length; i++){
 							circleMarkers[i].setStyle({radius: circleSize});
-					};}
-					
-				});			
+					};}					
+				});
 			});
-			
-			
+						
 			var lc = L.control.locate({
 				position: 'topleft',
 				flyTo: true,
@@ -214,7 +226,7 @@
 					title: "Here you are :)"
 				}
 			}).addTo(map);
-	
+			
 			function moveEndHandler () {
 				$("#infoBox").css({'visibility':'hidden'});
 			};
