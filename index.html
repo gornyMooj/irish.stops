@@ -126,7 +126,7 @@
 					var stopid = String(results[i].stopid);
 					var fullname = String(results[i].fullname);
 					var currentZoom = map.getZoom();
-					var circleSize = 10/parseInt(currentZoom);
+					var circleSize = 6;
 					
 					
 					var circleMarker = new L.circleMarker([latitude,longitude],{
