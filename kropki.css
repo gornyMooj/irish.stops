@@ -1,0 +1,118 @@
+	body {
+				padding: 0;
+				margin: 0;
+			}
+			html, body {
+				height: 100%;
+				width: 100%;
+			}
+
+			#map {
+				height: 100%;
+				width: 100%;
+			}
+			#infoBox {
+				
+				position:absolute;
+				top: 40%;
+				left:53px;
+				visibility: hidden;
+				z-index:800;
+				overflow: auto;			
+				max-height: 50%;
+				margin: 10px;
+				border: 1px solid #3388ff;
+				background-color: #ffffff;
+			}
+			#content,
+			#infoBoxHead {
+				padding: 5px;
+			}
+			#content {
+				margin-top: 0;
+				overflow: auto;
+				min-height: 30%;
+-				max-height: 70%;
+			}
+			#infoBoxHead {
+				height: 30%;
+				border-bottom: 1px solid #EEE;
+				background-color: #3388ff;
+				color: white;
+				font-weight: bold;
+			}
+			
+			#searchBox {
+				
+				position:absolute;
+				top: 2px;
+				left:53px;
+
+				z-index:800;
+				overflow: auto;			
+				max-height: 50%; /* was 50 */
+				max-width:30%;
+				margin: 10px;
+				border: 1px solid #3388ff;
+				background-color: #ffffff;
+				
+			}
+			/* #searchContent, */
+			#searchBoxFooter, 
+			#searchBoxHead {
+				padding: 5px;
+			}
+			#searchContent {
+				margin-top: 0;
+				overflow: auto;
+				padding: 5;
+				/*
+				min-height: 30%;
+-				max-height: 70%; 				
+				visibility: hidden;
+				*/
+				
+			}
+			#searchBoxHead {
+				height: 30%;
+				border-bottom: 1px solid #EEE;
+				background-color: #3388ff;
+				color: white;
+				font-weight: bold;
+			}
+			
+			#searchBoxFooter{
+				margin-top: 5px;
+				height: 30%;
+				border-bottom: 1px solid #EEE;
+				background-color: #3388ff;
+				color: white;
+				font-weight: bold;
+				font-size: 80%;				
+			}
+			
+			@media only screen and (max-width: 768px) {
+				table {
+					font-size: 60%;
+				}
+				#infobox {
+					top: 40%;
+					left:2%;
+				}
+			}
+			
+			.input-xs {
+				height: 22px!important;
+				padding: 2px 5px;
+				font-size: 12px;
+				line-height: 1.5;
+				border-radius: 3px;
+				}
+			.input-group-xs>.form-control,
+			.input-group-xs>.input-group-addon,
+			.input-group-xs>.input-group-btn>.btn {
+				height: 22px;
+				padding: 1px 5px;
+				font-size: 12px;
+				line-height: 1.5;
+			}
