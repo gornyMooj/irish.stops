@@ -65,13 +65,7 @@
 			#searchContent {
 				margin-top: 0;
 				overflow: auto;
-				padding: 5;
-				/*
-				min-height: 30%;
--				max-height: 70%; 				
-				visibility: hidden;
-				*/
-				
+				padding: 5;				
 			}
 			#searchBoxHead {
 				height: 30%;
@@ -98,6 +92,9 @@
 				#infobox {
 					top: 40%;
 					left:2%;
+				}
+				#searchBox{
+					max-width:60%;
 				}
 			}
 			
