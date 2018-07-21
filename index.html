@@ -10,6 +10,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
   <![endif]-->
   
+	<!--LOGO -->
+	<link rel="icon" href="logo.png">
+  
 	<!--D3-->
 	<script src="https://d3js.org/topojson.v1.min.js"></script>
 	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -25,6 +28,7 @@
 	
 	<!-- markercluster  -->
 	<link rel="stylesheet" href="MarkerCluster.css" />
+	<link rel="stylesheet" href="kropki.css" />
 	<link rel="stylesheet" href="MarkerCluster.Default.css" />
 	<script src="leaflet.markercluster-src.js"></script>
 	
@@ -35,78 +39,33 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   
-  
-	<style>
-			body {
-				padding: 0;
-				margin: 0;
-			}
-			html, body {
-				height: 100%;
-				width: 100%;
-			}
-
-			#map {
-				height: 100%;
-				width: 100%;
-			}
-			#infoBox {
-				
-				position:absolute;
-				top: 40%;
-				left:53px;
-				visibility: hidden;
-				z-index:800;
-				overflow: auto;			
-				max-height: 50%;
-				margin: 10px;
-				border: 1px solid #3388ff;
-				background-color: #ffffff;
-			}
-			#content,
-			#infoBoxHead {
-				padding: 5px;
-			}
-			#content {
-				margin-top: 0;
-				overflow: auto;
-				min-height: 30%;
--				max-height: 70%;
-			}
-			#infoBoxHead {
-				height: 30%;
-				border-bottom: 1px solid #EEE;
-				background-color: #3388ff;
-				color: white;
-				font-weight: bold;
-			}
-			
-			@media only screen and (max-width: 768px) {
-				table {
-					font-size: 60%;
-				}
-				#infobox {
-					top: 40%;
-					left:2%;
-				}
-			}
-	
-	</style>
-  
 </head>
 
 	<body>
 
 	</body>
+		<div id = "searchBox">
+			<div id = "searchBoxHead" style="cursor: pointer;">Find bus</div>
+			<div id = "searchContent"style="display:none">
+				<div class="input-group input-group-xs">
+					<input type="text" class="form-control" id = "busNumber"/>
+					<span class="input-group-btn">
+					<button class="btn btn-default" onclick="searchRout()">Search</button>
+					</span>
+				</div>
+				<div id = "searchBoxFooter" style="cursor: pointer; display:none">Display all stops</div>
+			</div>
+			
+		</div>
 		<div id = "infoBox">
 			<div id = "infoBoxHead"></div>
 			<div id = "content"></div>
 		</div>
 		<div id="map"></div>
 		
-	<script>
-			
 		
+	<script>
+						
 			var url = "https://data.smartdublin.ie/cgi-bin/rtpi/busstopinformation?stopid&format=json"
 			var map = L.map('map',{
 				preferCanvas: true
@@ -117,107 +76,183 @@
 				attribution: '&copy; ' + mapLink + ' Contributors',
 				maxZoom: 18,
             }).addTo(map);
-			
-			d3.json(url, function(data) {
-			
-				var results = data.results;
-				var numberOfStops = results.length;
-				// in circleMarkers all markers are stored; it is used in the resizing of the markers
-				var circleMarkers = [];
-				var circleSize = 6;
-			
-				var markers = L.markerClusterGroup({ 
-					disableClusteringAtZoom: 11, // turn off
-					spiderfyOnMaxZoom: false,
-				});
-			
-				for (var i = 0; i < numberOfStops; i++){
-					
-
-					var latitude = results[i].latitude;
-					var longitude = results[i].longitude;
-					var stopid = String(results[i].stopid);
-					var fullname = String(results[i].fullname);
-
-					
-					
-					var circleMarker = new L.circleMarker([latitude,longitude],{
-							color: '#3388ff',
-							radius: circleSize - 5.5,
-							fillOpacity: 1,
-							// Binding data to a marker
-							stopNumber: stopid,
-							nameStop: fullname
-							})
-					
-						//.addTo(map).on('click', onClick);
-						circleMarker.on('click', onClick);
-						markers.addLayer(circleMarker);
-					
-					circleMarkers.push(circleMarker);
-				};
-				
-				map.addLayer(markers);
-				
-				function onClick(e) {
-
-					var stopid = e.target.options.stopNumber;
-					var nameStop = e.target.options.nameStop;
 	
-					showInformation(stopid, nameStop);
-					
-				};
+			var circleMarkers = [];
+			var circleSize = 6;
 				
-				function showInformation(stopid, nameStop){
-					
-					urlStop = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=' + stopid + '&format=json';
-					
-						d3.select("#infoBoxHead")
-							.selectAll("p")
-							.remove();
-							
-						d3.select("#infoBoxHead")
-							.append("p")
-							.append("text")
-							.text(nameStop);
-						
-						d3.select("#content")
-							.selectAll("table")
-							.remove();
-																	
-					d3.json(urlStop, function(dataStop) {
-						$("#infoBox").css({'visibility':'visible'});
-						
-						var headers = ["route","duetime", "destination", "origin","monitored" ]
-						var results = dataStop.results	
-
-						var output='<table class="table table-hover">';
-						
-							output+='<tr><th scope="col">'+'Number'+'</th><th scope="col">'+'Arrival'+'</th><th scope="col">'+'Destination'+'</th><th scope="col">'+'Orgin'+'</th>'+'</th><th scope="col">'+'Monitored'+'</th></tr>'
-							for (var i=0;i<results.length;i++){
-								output+='<tr><td>'+results[i].route+'</td><td>'+results[i].duetime+' min'+'</td><td>'+results[i].destination+'</td><td>'+results[i].origin+'</td>'+'</td><td>'+results[i].monitored+'</td></tr>'    
-							}
-							output+='</table>';
-							$('#content').append(output);					
-					});
-				};
-				
-				
-				map.on('zoomend', function () {
-                // dinamicly changes a size of markers depending on the current zoom level
-					var currentZoom = map.getZoom(); // gets current zoom
-					console.log(currentZoom);
-					
-					if(currentZoom < 15){
-						for(var i = 0; i < circleMarkers.length; i++){
-							circleMarkers[i].setStyle({radius: 0.5});
-						}; 						
-					}else{
-						for(var i = 0; i < circleMarkers.length; i++){
-							circleMarkers[i].setStyle({radius: circleSize});
-					};}					
-				});
+			var markers = L.markerClusterGroup({ 
+				disableClusteringAtZoom: 11,
+				spiderfyOnMaxZoom: false,
 			});
+			
+			function showBuses(busNumber,doNottrigger){
+			
+				d3.json(url, function(data) {
+					var results = data.results;
+					var numberOfStops = results.length;
+				
+					if(busNumber === '' && doNottrigger === '') {				
+						for (var i = 0; i < numberOfStops; i++){										
+							var latitude = results[i].latitude;
+							var longitude = results[i].longitude;
+							var stopid = String(results[i].stopid);
+							var fullname = String(results[i].fullname);	
+							
+							var circleMarker = new L.circleMarker([latitude,longitude],{
+									color: '#3388ff',
+									radius: circleSize - 5.5,
+									fillOpacity: 1,
+									stopNumber: stopid,
+									nameStop: fullname
+									});
+				
+								circleMarker.on('click', onClick);
+								markers.addLayer(circleMarker);
+							
+							circleMarkers.push(circleMarker);
+						};
+						
+						map.addLayer(markers);
+						
+					}
+					else {
+						if(busNumber === '') {
+							alert("You need to provide a bus number ;)");
+						}else{
+							emptyMap();
+							
+							for (var i = 0; i < numberOfStops; i++){
+								var routes = results[i].operators[0].routes
+								var routesLength = routes.length;
+																
+								for (var j = 0; j < routesLength; j++) {
+									if( busNumber === routes[j] ) {										
+										var latitude = results[i].latitude;
+										var longitude = results[i].longitude;
+										var stopid = String(results[i].stopid);
+										var fullname = String(results[i].fullname);									
+										var circleMarker = new L.circleMarker([latitude,longitude],{
+											color: '#ffcc00',
+											radius: circleSize - 5.5,
+											fillOpacity: 1,
+											// Binding data to a marker
+											stopNumber: stopid,
+											nameStop: fullname
+											});
+	
+										circleMarker.on('click', onClick);
+										markers.addLayer(circleMarker);
+									
+									circleMarkers.push(circleMarker);	
+									};
+								};								
+							};
+							map.addLayer(markers);
+							if(circleMarkers === undefined || circleMarkers.length == 0) {
+								alert('Wrong input: ' + busNumber + '.\n\nProvite correct Route.')
+								drowBlueDots(busNumber);								
+							}else{
+								$("#searchBoxHead").css({'background-color':'#ffcc00'});
+								$("#infoBox").css({'border': '1px solid #ffcc00'});
+								
+								$("#infoBoxHead").css({'background-color':'#ffcc00'});
+								$("#searchBox").css({'border': '1px solid #ffcc00'});
+
+								$("#searchBoxFooter").css({'display':''});								
+							};						
+						};
+					};
+									
+
+					
+					function onClick(e) {
+						var stopid = e.target.options.stopNumber;
+						var nameStop = e.target.options.nameStop;
+		
+						showInformation(stopid, nameStop);						
+					};
+					
+					function showInformation(stopid, nameStop){
+						
+						urlStop = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=' + stopid + '&format=json';
+						
+							d3.select("#infoBoxHead")
+								.selectAll("p")
+								.remove();
+								
+							d3.select("#infoBoxHead")
+								.append("p")
+								.append("text")
+								.text(nameStop);
+							
+							d3.select("#content")
+								.selectAll("table")
+								.remove();
+																		
+						d3.json(urlStop, function(dataStop) {
+							$("#infoBox").css({'visibility':'visible'});
+							
+							var headers = ["route","duetime", "destination", "origin","monitored" ]
+							var results = dataStop.results	
+
+							var output='<table class="table table-hover">';
+							
+								output+='<tr><th scope="col">'+'Number'+'</th><th scope="col">'+'Arrival'+'</th><th scope="col">'+'Destination'+'</th><th scope="col">'+'Orgin'+'</th>'+'</th><th scope="col">'+'Monitored'+'</th></tr>'
+								for (var i=0;i<results.length;i++){
+									output+='<tr><td>'+results[i].route+'</td><td>'+results[i].duetime+' min'+'</td><td>'+results[i].destination+'</td><td>'+results[i].origin+'</td>'+'</td><td>'+results[i].monitored+'</td></tr>'    
+								}
+								output+='</table>';
+								$('#content').append(output);					
+						});
+					};
+					
+					map.on('zoomend', function () {
+						var currentZoom = map.getZoom();
+						
+						if(currentZoom < 15){							
+							for(var i = 0; i < circleMarkers.length; i++){
+								circleMarkers[i].setStyle({
+									radius: 0.5
+								});								
+							};							
+						}else{
+							for(var i = 0; i < circleMarkers.length; i++){
+								circleMarkers[i].setStyle({
+									radius: circleSize,
+								});
+						};}					
+					});
+				});
+			};
+								
+			var busNumber = '';	
+			var doNottrigger = '';
+			
+			showBuses(busNumber,doNottrigger);
+			
+			function searchRout() {
+					doNottrigger = 'lockBlueDots';
+					busNumber = $("#busNumber").val();
+					$("#busNumber").val('');
+					showBuses(busNumber,doNottrigger);
+				};
+
+				$('#searchBoxHead').click(function(){
+					$('#searchContent').animate({width: 'toggle',height:'toggle'});
+				});
+				
+				$('#searchBoxFooter').click(function(){
+					emptyMap();
+					$("#searchBoxHead").css({'background-color':'#3388ff'});
+					$("#infoBox").css({'border': '1px solid #3388ff'});
+								
+					$("#infoBoxHead").css({'background-color':'#3388ff'});
+					$("#searchBox").css({'border': '1px solid #3388ff'});
+
+					$("#searchBoxFooter").css({'display':'none'});	
+					
+					drowBlueDots(busNumber);
+				});
 						
 			var lc = L.control.locate({
 				position: 'topleft',
@@ -230,7 +265,24 @@
 			function moveEndHandler () {
 				$("#infoBox").css({'visibility':'hidden'});
 			};
+			
+			function drowBlueDots(busNumber) {							
+				busNumber = '';	
+				doNottrigger = '';
+				showBuses(busNumber,doNottrigger);
+			};
+			
+			function emptyMap() {
+				for(var i = 0; i < circleMarkers.length; i++){
+						map.removeLayer(circleMarkers[i]);
+					};
+					map.removeLayer(markers);
+					markers.clearLayers()
+					circleMarkers = []
+			};
+			
 			map.on('moveend', moveEndHandler);
+			
 	</script>
 </body>
 </html>
