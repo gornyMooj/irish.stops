@@ -120,6 +120,11 @@
 				#searchBox{
 					max-width:60%;
 				}
+				#esriMap:hover { 
+					height:80px;
+					width:80px;
+				}
+				
 			}
 			
 			.input-xs {
