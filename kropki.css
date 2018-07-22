@@ -42,16 +42,14 @@
 				font-weight: bold;
 			}
 			
-			#searchBox {
-				
+			#searchBox {		
 				position:absolute;
 				top: 2px;
 				left:53px;
-
 				z-index:800;
 				overflow: auto;			
 				max-height: 50%; /* was 50 */
-				max-width:30%;
+				max-width:20%;
 				margin: 10px;
 				border: 1px solid #3388ff;
 				background-color: #ffffff;
@@ -65,7 +63,13 @@
 			#searchContent {
 				margin-top: 0;
 				overflow: auto;
-				padding: 5;				
+				padding: 5;
+				/*
+				min-height: 30%;
+-				max-height: 70%; 				
+				visibility: hidden;
+				*/
+				
 			}
 			#searchBoxHead {
 				height: 30%;
@@ -83,6 +87,26 @@
 				color: white;
 				font-weight: bold;
 				font-size: 80%;				
+			}
+			#esriMap{
+				position:absolute;
+				top: 2px;
+				right: 2px;
+				z-index:800;
+				height:40px;
+				width:40px;
+				margin: 10px;
+				background-color: black;
+				border: 1px solid #3388ff;
+				
+			}
+			#esriMap:hover { 
+				height:80px;
+				width:80px;
+			}
+			img {
+				max-width: 100%;
+				max-height: 100%;
 			}
 			
 			@media only screen and (max-width: 768px) {
@@ -113,3 +137,4 @@
 				font-size: 12px;
 				line-height: 1.5;
 			}
+			
