@@ -123,7 +123,7 @@
 						};
 						
 						map.addLayer(markers);
-						
+						resetView();
 					}
 					else {
 						if(busNumber === '') {
@@ -171,6 +171,8 @@
 								$("#searchBoxFooter").css({'display':''});								
 							};						
 						};
+						
+						resetView();
 					};
 									
 
@@ -183,6 +185,7 @@
 					};
 					
 					function showInformation(stopid, nameStop){
+					
 						
 						urlStop = 'https://data.smartdublin.ie/cgi-bin/rtpi/realtimebusinformation?stopid=' + stopid + '&format=json';
 						
@@ -205,11 +208,11 @@
 							var headers = ["route","duetime", "destination", "origin","monitored" ]
 							var results = dataStop.results	
 
-							var output='<table class="table table-hover">';
+							var output='<table id="tableInfo" class="table table-hover">';
 							
 								output+='<tr><th scope="col">'+'Number'+'</th><th scope="col">'+'Arrival'+'</th><th scope="col">'+'Destination'+'</th><th scope="col">'+'Orgin'+'</th>'+'</th><th scope="col">'+'Monitored'+'</th></tr>'
 								for (var i=0;i<results.length;i++){
-									output+='<tr><td>'+results[i].route+'</td><td>'+results[i].duetime+' min'+'</td><td>'+results[i].destination+'</td><td>'+results[i].origin+'</td>'+'</td><td>'+results[i].monitored+'</td></tr>'    
+									output+='<tr style="cursor: pointer;"><td>'+results[i].route+'</td><td>'+results[i].duetime+' min'+'</td><td>'+results[i].destination+'</td><td>'+results[i].origin+'</td>'+'</td><td>'+results[i].monitored+'</td></tr>'    
 								}
 								output+='</table>';
 								$('#content').append(output);					
@@ -217,8 +220,7 @@
 					};
 					
 					map.on('zoomend', function () {
-						var currentZoom = map.getZoom();
-						
+						var currentZoom = map.getZoom();						
 						if(currentZoom < 15){							
 							for(var i = 0; i < circleMarkers.length; i++){
 								circleMarkers[i].setStyle({
@@ -233,6 +235,9 @@
 						};}					
 					});
 				});
+				
+				//resetView();
+				
 			};
 								
 			var busNumber = '';	
@@ -262,6 +267,7 @@
 					$("#searchBoxFooter").css({'display':'none'});	
 					$( "#searchBoxHead" ).click()
 					drowBlueDots(busNumber);
+					$('#searchBoxHead').text('Find bus');
 				});
 						
 			var lc = L.control.locate({
@@ -280,6 +286,12 @@
 				busNumber = '';	
 				doNottrigger = '';
 				showBuses(busNumber,doNottrigger);
+				
+				if ( $('#infoBox').css('visibility') == 'visible'){
+					$("#infoBox").css({'visibility':'hidden'});
+				};
+				
+				
 			};
 			
 			function emptyMap() {
@@ -309,9 +321,31 @@
 				}
 				
 			});
+			
 		
-			
-			
+			$("#content").on('click', '#tableInfo tr', function (event) {
+				var noFromTable = $(this).find("td:first").html();
+				doNottrigger = 'lockBlueDots';
+				showBuses(noFromTable,doNottrigger);
+
+				if ( $('#searchContent').css('display') == 'none' || $('#searchContent').css("visibility") == "hidden"){
+					$('#searchContent').animate({width: 'toggle',height:'toggle'});
+				};
+				
+				$('#searchBoxHead').text('Selected Route: '+ noFromTable);
+				$("#infoBox").css({'visibility':'hidden'});
+			});
+
+			function resetView() {			
+				if(circleMarkers.length < 9000){
+
+					var group = new L.featureGroup(circleMarkers); // dziala
+					var bounds = group.getBounds();
+					map.flyToBounds(bounds);
+				}else{
+					map.flyTo([53.348373824522, -6.2697172164917], 11);				
+				}; 
+			};
 			
 			map.on('moveend', moveEndHandler);
 			
